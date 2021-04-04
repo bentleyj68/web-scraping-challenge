@@ -69,7 +69,19 @@ def scrape():
         
         products_links.append({"title" : heading, "img_url" : product_link})
 
-    mars_data['product_links'] = products_links
+    # Now that we have the page for each product, scrape the image link for each product 
+    image_links = []
+    for hemisphere in products_links:
+        browser.visit(hemisphere['img_url'])
+        html = browser.html
+        soup_hemisphere = BeautifulSoup(html, 'html.parser')
+        photo_url = \
+            f"https://astrogeology.usgs.gov{soup_hemisphere.find('img', class_='wide-image')['src']}"
+
+        image_links.append({"title" : hemisphere['title'], "img_url" : photo_url})
+
+        mars_data['image_links'] = image_links
 
     browser.quit()
+    
     return mars_data
